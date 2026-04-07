@@ -1,59 +1,43 @@
 import java.util.Arrays;
 
 /**
- * UC16: Sort Passenger Bogies by Capacity (Bubble Sort – Algorithm Intro)
- * This class demonstrates manual sorting logic using nested loops and
- * adjacent comparisons to build algorithmic thinking.
+ * UC17: Sort Bogie Names Using Arrays.sort()
+ * This class demonstrates the use of Java's built-in utility methods
+ * for efficient, alphabetical sorting of bogie types.
  */
 public class TrainConsistManagementApp {
 
     public static void main(String[] args) {
-        System.out.println("=== Train Consist Management: Manual Bubble Sort ===\n");
+        System.out.println("=== Train Consist Management: Built-in Array Sorting ===\n");
 
-        // 1. Initialize an array of passenger bogie capacities
-        // Scenarios include: Unsorted, Duplicates, and Single elements
-        int[] bogieCapacities = {72, 56, 24, 70, 56, 60};
+        // 1. Initialize an array of bogie type names
+        // Note: The data is unsorted and contains duplicates to test robustness.
+        String[] bogieTypes = {
+                "Sleeper",
+                "AC Chair",
+                "First Class",
+                "General",
+                "Luxury",
+                "Sleeper"
+        };
 
-        System.out.println("Initial Capacities: " + Arrays.toString(bogieCapacities));
+        System.out.println("Initial Bogie Names:  " + Arrays.toString(bogieTypes));
 
-        // 2. Perform Bubble Sort Algorithm
-        bubbleSort(bogieCapacities);
+        // 2. Perform Alphabetical Sorting
+        // Arrays.sort() uses 'Natural Ordering' for Strings (A-Z)
+        Arrays.sort(bogieTypes);
 
         // 3. Display the Sorted Results
-        System.out.println("Sorted Capacities:  " + Arrays.toString(bogieCapacities));
+        System.out.println("Sorted Bogie Names:   " + Arrays.toString(bogieTypes));
 
         // 4. Edge Case: Single Element Array
-        int[] singleBogie = {50};
-        bubbleSort(singleBogie);
-        System.out.println("Single Bogie Sort:  " + Arrays.toString(singleBogie));
+        String[] singleBogie = {"Engine"};
+        Arrays.sort(singleBogie);
+        System.out.println("Single Element Sort:  " + Arrays.toString(singleBogie));
 
-        System.out.println("\nAlgorithm Note: Bubble Sort uses O(n²) time complexity.");
-        System.out.println("=====================================================");
+        // 5. Performance Context
+        System.out.println("\nLibrary Note: Arrays.sort() is O(n log n), making it ideal for large datasets.");
+        System.out.println("Standard libraries are preferred in production for speed and readability.");
+        System.out.println("========================================================");
     }
-
-    /**
-     * Manual implementation of the Bubble Sort algorithm.
-     * Iterates through the array and swaps adjacent elements if they are out of order.
-     */
-    public static void bubbleSort(int[] arr) {
-        int n = arr.length;
-
-        // Outer loop: Controls the number of passes
-        for (int i = 0; i < n - 1; i++) {
-
-            // Inner loop: Compares adjacent elements
-            // After each pass, the largest element is 'bubbled' to the end (n-i-1)
-            for (int j = 0; j < n - i - 1; j++) {
-
-                // If the left element is greater than the right, swap them
-                if (arr[j] > arr[j + 1]) {
-                    // Swapping Logic using a temporary variable
-                    int temp = arr[j];
-                    arr[j] = arr[j + 1];
-                    arr[j + 1] = temp;
-                }
-            }
-        }
-    }
-}
 }
