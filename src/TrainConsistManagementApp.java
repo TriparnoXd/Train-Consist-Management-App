@@ -18,57 +18,56 @@ class Bogie {
 
     @Override
     public String toString() {
-        return String.format("%-15s | Capacity: %d seats", name, capacity);
+        return String.format("[Type: %s, Cap: %d]", name, capacity);
     }
 }
 
 /**
- * UC8: Filter Passenger Bogies Using Streams
- * This class demonstrates functional-style collection processing to
- * select bogies based on business rules (Capacity > 60).
+ * UC9: Group Bogies by Type (Collectors.groupingBy)
+ * This class demonstrates how to transform flat data into a
+ * structured Map for better reporting and operational visibility.
  */
 public class TrainConsistManagementApp {
 
     public static void main(String[] args) {
-        System.out.println("=== Train Consist Management: Stream Filtering ===");
+        System.out.println("=== Train Consist Management: Categorized Grouping ===");
 
-        // 1. Initialize the list of bogies (as in UC7)
-        List<Bogie> allBogies = new ArrayList<>();
-        allBogies.add(new Bogie("Sleeper", 72));
-        allBogies.add(new Bogie("AC Chair", 56));
-        allBogies.add(new Bogie("First Class", 24));
-        allBogies.add(new Bogie("General", 90));
-        allBogies.add(new Bogie("Executive", 40));
+        // 1. Initialize the list with multiple bogies of the same type
+        List<Bogie> trainConsist = new ArrayList<>();
+        trainConsist.add(new Bogie("Sleeper", 72));
+        trainConsist.add(new Bogie("Sleeper", 72));
+        trainConsist.add(new Bogie("AC Chair", 56));
+        trainConsist.add(new Bogie("First Class", 24));
+        trainConsist.add(new Bogie("AC Chair", 56));
+        trainConsist.add(new Bogie("General", 90));
 
-        System.out.println("Total bogies in system: " + allBogies.size());
+        System.out.println("Total bogies registered: " + trainConsist.size());
 
-        // 2. Stream Pipeline: Filter and Collect
-        // We want to find "High-Capacity" bogies (Capacity > 60)
-        int threshold = 60;
-        System.out.println("\nFiltering bogies with capacity greater than " + threshold + "...");
+        // 2. Stream Pipeline: Grouping by Bogie Name
+        // groupingBy takes a classifier function (Bogie::getName)
+        Map<String, List<Bogie>> groupedBogies = trainConsist.stream()
+                .collect(Collectors.groupingBy(Bogie::getName));
 
-        List<Bogie> highCapacityBogies = allBogies.stream()
-                .filter(b -> b.getCapacity() > threshold) // Lambda expression for the condition
-                .collect(Collectors.toList());            // Gather results into a new list
+        // 3. Display the Grouped Results
+        System.out.println("\n--- Structured Consist Report (Grouped by Type) ---");
 
-        // 3. Display Filtered Results
-        System.out.println("--- High-Capacity Bogie Report ---");
-        if (highCapacityBogies.isEmpty()) {
-            System.out.println("No bogies match the criteria.");
-        } else {
-            highCapacityBogies.forEach(System.out::println);
+        groupedBogies.forEach((type, list) -> {
+            System.out.println("Category: " + type + " | Total Units: " + list.size());
+            for (Bogie b : list) {
+                System.out.println("  -> " + b);
+            }
+        });
+
+        // 4. Specific Category Analysis
+        System.out.println("\n--- Quick Category Check ---");
+        if (groupedBogies.containsKey("Sleeper")) {
+            int sleeperCount = groupedBogies.get("Sleeper").size();
+            System.out.println("Ready to depart: " + sleeperCount + " Sleeper bogies found.");
         }
 
-        // 4. Verification of Original Collection Integrity
-        // The Stream API does not modify 'allBogies'
-        System.out.println("\nVerification: Original list still contains " + allBogies.size() + " bogies.");
-
-        // 5. Another Example: Finding small bogies (Capacity <= 40)
-        System.out.println("\n--- Special-Purpose Bogie Report (Capacity <= 40) ---");
-        allBogies.stream()
-                .filter(b -> b.getCapacity() <= 40)
-                .forEach(System.out::println);
-
-        System.out.println("=================================================");
+        // 5. Verification of Original Collection Integrity
+        System.out.println("\nVerification: Original list remains a flat sequence of "
+                + trainConsist.size() + " bogies.");
+        System.out.println("======================================================");
     }
 }
