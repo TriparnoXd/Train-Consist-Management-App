@@ -1,68 +1,66 @@
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
- * UC11: Validate Train ID & Cargo Codes (Regex)
- * This class demonstrates format enforcement using Regular Expressions
- * to ensure data integrity before the train is processed.
+ * Bogie Class: Represents a custom object with attributes.
+ */
+class Bogie {
+    private String name;
+    private int capacity;
+
+    public Bogie(String name, int capacity) {
+        this.name = name;
+        this.capacity = capacity;
+    }
+
+    public int getCapacity() { return capacity; }
+}
+
+/**
+ * UC13: Performance Comparison (Loops vs Streams)
+ * This class benchmarks the execution time of traditional loops
+ * versus modern Stream API using nanosecond precision.
  */
 public class TrainConsistManagementApp {
 
-    // Define Regex Patterns as constants for reusability
-    // TRN- followed by exactly 4 digits (\\d{4})
-    private static final String TRAIN_ID_REGEX = "TRN-\\d{4}";
-
-    // PET- followed by exactly 2 uppercase letters ([A-Z]{2})
-    private static final String CARGO_CODE_REGEX = "PET-[A-Z]{2}";
-
     public static void main(String[] args) {
-        System.out.println("=== Train Consist Management: Regex Validation ===");
+        System.out.println("=== Train Consist Management: Performance Benchmarking ===\n");
 
-        // 1. Compile the Patterns
-        Pattern trainIdPattern = Pattern.compile(TRAIN_ID_REGEX);
-        Pattern cargoCodePattern = Pattern.compile(CARGO_CODE_REGEX);
+        // 1. Prepare a larger dataset for meaningful measurement
+        List<Bogie> largeTrainConsist = new ArrayList<>();
+        for (int i = 0; i < 10000; i++) {
+            largeTrainConsist.add(new Bogie("Sleeper", 72));
+            largeTrainConsist.add(new Bogie("AC Chair", 56));
+            largeTrainConsist.add(new Bogie("First Class", 24));
+        }
 
-        // 2. Test Data (Valid and Invalid)
-        String[] testTrainIds = {"TRN-1234", "TRAIN12", "TRN-123", "TRN-12345", "TRN-9999"};
-        String[] testCargoCodes = {"PET-AB", "PET-bc", "PET123", "PET-XY", "AB-PET"};
+        System.out.println("Processing " + largeTrainConsist.size() + " bogies...");
+        int capacityThreshold = 60;
 
-        // 3. Validate Train IDs
-        System.out.println("\n--- Validating Train IDs ---");
-        for (String id : testTrainIds) {
-            Matcher matcher = trainIdPattern.matcher(id);
-            if (matcher.matches()) {
-                System.out.println("[VALID]   : " + id);
-            } else {
-                System.out.println("[INVALID] : " + id + " (Required format: TRN-xxxx)");
+        // 2. Benchmark: Traditional For-Loop
+        long startTimeLoop = System.nanoTime();
+        List<Bogie> loopResults = new ArrayList<>();
+        for (Bogie b : largeTrainConsist) {
+            if (b.getCapacity() > capacityThreshold) {
+                loopResults.add(b);
             }
         }
+        long endTimeLoop = System.nanoTime();
+        long durationLoop = endTimeLoop - startTimeLoop;
 
-        // 4. Validate Cargo Codes
-        System.out.println("\n--- Validating Cargo Codes ---");
-        for (String code : testCargoCodes) {
-            Matcher matcher = cargoCodePattern.matcher(code);
-            if (matcher.matches()) {
-                System.out.println("[VALID]   : " + code);
-            } else {
-                System.out.println("[INVALID] : " + code + " (Required format: PET-XX)");
-            }
-        }
+        // 3. Benchmark: Java Streams
+        long startTimeStream = System.nanoTime();
+        List<Bogie> streamResults = largeTrainConsist.stream()
+                .filter(b -> b.getCapacity() > capacityThreshold)
+                .collect(Collectors.toList());
+        long endTimeStream = System.nanoTime();
+        long durationStream = endTimeStream - startTimeStream;
 
-        // 5. Example of Functional Usage
-        System.out.println("\n--- Final System Check ---");
-        String finalId = "TRN-2026";
-        if (validate(finalId, TRAIN_ID_REGEX)) {
-            System.out.println("System initialized successfully for Train: " + finalId);
-        }
+        // 4. Display Results and Comparison
+        System.out.println("\n--- Performance Results ---");
+        System.out.println("Loop-Based Time   : " + durationLoop + " ns");
+        System.out.println("Stream-Based Time : " + durationStream + " ns");
 
-        System.out.println("===================================================");
-    }
-
-    /**
-     * Helper method to demonstrate clean validation logic
-     */
-    public static boolean validate(String input, String regex) {
-        return Pattern.compile(regex).matcher(input).matches();
-    }
-}
+        // 5. Verification of Consistency
+        System.out.println("\n--- Consistency Check ---");
+        System.out.println("Loop Result Size  : " + loopResults.
