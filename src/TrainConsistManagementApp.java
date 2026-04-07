@@ -1,66 +1,87 @@
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
- * Bogie Class: Represents a custom object with attributes.
+ * Custom Exception: InvalidCapacityException
+ * A domain-specific checked exception to handle railway business rule violations.
+ */
+class InvalidCapacityException extends Exception {
+    public InvalidCapacityException(String message) {
+        super(message);
+    }
+}
+
+/**
+ * Bogie Class: Represents a custom object with built-in validation.
  */
 class Bogie {
     private String name;
     private int capacity;
 
-    public Bogie(String name, int capacity) {
+    /**
+     * Constructor with Fail-Fast Validation.
+     * @throws InvalidCapacityException if capacity is less than or equal to zero.
+     */
+    public Bogie(String name, int capacity) throws InvalidCapacityException {
+        if (capacity <= 0) {
+            throw new InvalidCapacityException("Invalid Capacity: [" + capacity +
+                    "]. Capacity must be greater than zero for " + name + ".");
+        }
         this.name = name;
         this.capacity = capacity;
     }
 
-    public int getCapacity() { return capacity; }
+    @Override
+    public String toString() {
+        return String.format("Bogie: %-12s | Capacity: %d seats", name, capacity);
+    }
 }
 
 /**
- * UC13: Performance Comparison (Loops vs Streams)
- * This class benchmarks the execution time of traditional loops
- * versus modern Stream API using nanosecond precision.
+ * UC14: Handle Invalid Bogie Capacity (Custom Exception)
+ * This class demonstrates enforcing business constraints during object creation.
  */
 public class TrainConsistManagementApp {
 
     public static void main(String[] args) {
-        System.out.println("=== Train Consist Management: Performance Benchmarking ===\n");
+        System.out.println("=== Train Consist Management: Custom Exception Handling ===\n");
 
-        // 1. Prepare a larger dataset for meaningful measurement
-        List<Bogie> largeTrainConsist = new ArrayList<>();
-        for (int i = 0; i < 10000; i++) {
-            largeTrainConsist.add(new Bogie("Sleeper", 72));
-            largeTrainConsist.add(new Bogie("AC Chair", 56));
-            largeTrainConsist.add(new Bogie("First Class", 24));
+        List<Bogie> trainConsist = new ArrayList<>();
+
+        // Test Case 1: Valid Capacity Creation
+        try {
+            System.out.println("Attempting to add valid bogies...");
+            trainConsist.add(new Bogie("Sleeper", 72));
+            trainConsist.add(new Bogie("AC Chair", 56));
+            System.out.println("Successfully added valid bogies.");
+        } catch (InvalidCapacityException e) {
+            System.err.println("Unexpected Error: " + e.getMessage());
         }
 
-        System.out.println("Processing " + largeTrainConsist.size() + " bogies...");
-        int capacityThreshold = 60;
-
-        // 2. Benchmark: Traditional For-Loop
-        long startTimeLoop = System.nanoTime();
-        List<Bogie> loopResults = new ArrayList<>();
-        for (Bogie b : largeTrainConsist) {
-            if (b.getCapacity() > capacityThreshold) {
-                loopResults.add(b);
-            }
+        // Test Case 2: Zero Capacity Detection
+        try {
+            System.out.println("\nAttempting to add a bogie with ZERO capacity...");
+            trainConsist.add(new Bogie("Pantry Car", 0));
+        } catch (InvalidCapacityException e) {
+            System.err.println("CATCHED ERROR: " + e.getMessage());
         }
-        long endTimeLoop = System.nanoTime();
-        long durationLoop = endTimeLoop - startTimeLoop;
 
-        // 3. Benchmark: Java Streams
-        long startTimeStream = System.nanoTime();
-        List<Bogie> streamResults = largeTrainConsist.stream()
-                .filter(b -> b.getCapacity() > capacityThreshold)
-                .collect(Collectors.toList());
-        long endTimeStream = System.nanoTime();
-        long durationStream = endTimeStream - startTimeStream;
+        // Test Case 3: Negative Capacity Detection
+        try {
+            System.out.println("\nAttempting to add a bogie with NEGATIVE capacity...");
+            trainConsist.add(new Bogie("First Class", -10));
+        } catch (InvalidCapacityException e) {
+            System.err.println("CATCHED ERROR: " + e.getMessage());
+        }
 
-        // 4. Display Results and Comparison
-        System.out.println("\n--- Performance Results ---");
-        System.out.println("Loop-Based Time   : " + durationLoop + " ns");
-        System.out.println("Stream-Based Time : " + durationStream + " ns");
+        // Final Result Display
+        System.out.println("\n--- Final Valid Train Consist ---");
+        if (trainConsist.isEmpty()) {
+            System.out.println("No bogies were successfully added.");
+        } else {
+            trainConsist.forEach(System.out::println);
+        }
 
-        // 5. Verification of Consistency
-        System.out.println("\n--- Consistency Check ---");
-        System.out.println("Loop Result Size  : " + loopResults.
+        System.out.println("\nTotal Valid Bogies: " + trainConsist.size());
+        System.out.println("==========================================================");
+    }
+}
