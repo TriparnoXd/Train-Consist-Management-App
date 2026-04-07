@@ -1,34 +1,47 @@
 import java.util.*;
 
 /**
- * UC3: Track Unique Bogie IDs (Set – HashSet)
- * This class demonstrates how to enforce data integrity using a HashSet.
+ * UC4: Maintain Ordered Bogie IDs (LinkedList)
+ * This class demonstrates how a LinkedList models the physical chaining of a train.
  */
 public class TrainConsistManagementApp {
 
     public static void main(String[] args) {
-        System.out.println("=== Train Consist Management: Bogie ID Tracking ===");
+        System.out.println("=== Train Consist Management: LinkedList Chaining ===");
 
-        // 1. Initialize HashSet to ensure only unique Bogie IDs are stored
-        Set<String> bogieIds = new HashSet<>();
+        // 1. Initialize LinkedList
+        // LinkedList is ideal for frequent insertions at the head or tail
+        LinkedList<String> trainConsist = new LinkedList<>();
 
-        // 2. Add Bogie IDs (including duplicates to test uniqueness)
-        System.out.println("Registering bogies to the train...");
+        // 2. Building the Train (Chaining Bogies)
+        trainConsist.add("Sleeper");
+        trainConsist.add("AC Coach");
+        trainConsist.add("Cargo");
 
-        bogieIds.add("BG101");
-        bogieIds.add("BG102");
-        bogieIds.add("BG103");
+        // Using specific LinkedList methods for Head and Tail
+        trainConsist.addFirst("Engine"); // Locomotive must be at the front
+        trainConsist.addLast("Guard Coach"); // Guard coach is always at the end
 
-        // Intentionally adding duplicates
-        bogieIds.add("BG101");
-        bogieIds.add("BG102");
+        System.out.println("Initial Train Formation:");
+        System.out.println(trainConsist);
 
-        // 3. Displaying the Set
-        // The HashSet automatically handles deduplication
-        System.out.println("\nFinal Consist ID List (Automatically Deduplicated):");
-        System.out.println(bogieIds);
+        // 3. Middle Insertion
+        // Adding a Pantry Car at index 2 (position 3)
+        System.out.println("\nInserting 'Pantry Car' at position 2...");
+        trainConsist.add(2, "Pantry Car");
 
-        System.out.println("\nTotal Unique Bogies: " + bogieIds.size());
-        System.out.println("==================================================");
+        System.out.println("Updated Consist: " + trainConsist);
+
+        // 4. Detaching Bogies (Head and Tail operations)
+        System.out.println("\nDetaching first and last bogies for maintenance...");
+        trainConsist.removeFirst(); // Removes Engine
+        trainConsist.removeLast();  // Removes Guard Coach
+
+        // 5. Final Display
+        System.out.println("\nFinal Ordered Train Consist:");
+        System.out.println(trainConsist);
+
+        System.out.println("\nTotal Bogies Remaining: " + trainConsist.size());
+        System.out.println("=====================================================");
     }
 }
