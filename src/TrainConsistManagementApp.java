@@ -1,68 +1,64 @@
-import java.util.Arrays;
+import java.util.*;
 
 /**
- * UC19: Binary Search for Bogie ID (Optimized Searching)
- * This class demonstrates the divide-and-conquer strategy to find
- * a bogie ID in O(log n) time.
+ * UC20: Exception Handling During Search Operations
+ * This class demonstrates defensive programming by validating the system state
+ * before allowing search operations to proceed.
  */
 public class TrainConsistManagementApp {
 
     public static void main(String[] args) {
-        System.out.println("=== Train Consist Management: Binary Search System ===\n");
+        System.out.println("=== Train Consist Management: Search State Validation ===\n");
 
-        // 1. Initialize an array of Bogie IDs (Unsorted to test precondition handling)
-        String[] bogieIds = {"BG309", "BG101", "BG550", "BG205", "BG412"};
+        // 1. Scenario A: Searching an EMPTY consist (Should throw exception)
+        String[] emptyConsist = {};
+        System.out.println("Scenario A: Searching in an empty train consist...");
+        try {
+            validateAndSearch(emptyConsist, "BG101");
+        } catch (IllegalStateException e) {
+            System.err.println("CRITICAL ERROR: " + e.getMessage());
+        }
 
-        // 2. Precondition: Binary Search REQUIRES sorted data
-        System.out.println("Initial IDs (Unsorted): " + Arrays.toString(bogieIds));
-        Arrays.sort(bogieIds);
-        System.out.println("Sorted IDs (Required): " + Arrays.toString(bogieIds));
-
-        // 3. Define search targets
-        String searchKey1 = "BG309"; // Mid/Random position
-        String searchKey2 = "BG101"; // First element
-        String searchKey3 = "BG999"; // Non-existent
-
-        // 4. Perform Binary Search
-        System.out.println("\n--- Starting Binary Search Operations ---");
-        performBinarySearch(bogieIds, searchKey1);
-        performBinarySearch(bogieIds, searchKey2);
-        performBinarySearch(bogieIds, searchKey3);
+        // 2. Scenario B: Searching a VALID consist
+        String[] activeConsist = {"BG101", "BG205", "BG309"};
+        System.out.println("\nScenario B: Searching in an active train consist...");
+        try {
+            validateAndSearch(activeConsist, "BG205"); // Should succeed
+            validateAndSearch(activeConsist, "BG999"); // Should pass validation but not find ID
+        } catch (IllegalStateException e) {
+            System.err.println("Unexpected Error: " + e.getMessage());
+        }
 
         System.out.println("\n=====================================================");
     }
 
     /**
-     * Binary Search Logic
-     * Uses low, high, and mid pointers to narrow the search range.
+     * Defensive Search Method
+     * Performs state validation before executing search logic.
+     * @throws IllegalStateException if the array is null or empty.
      */
-    public static void performBinarySearch(String[] arr, String key) {
-        int low = 0;
-        int high = arr.length - 1;
-        int position = -1;
+    public static void validateAndSearch(String[] bogies, String searchKey) {
+        // 1. State Validation (Fail-Fast)
+        if (bogies == null || bogies.length == 0) {
+            throw new IllegalStateException("Search Denied: The train consist is currently empty. " +
+                    "Please add bogies before searching.");
+        }
+
+        // 2. Search Logic (Only executes if state is valid)
+        System.out.println("Searching for Bogie ID: " + searchKey + "...");
+
         boolean found = false;
-
-        while (low <= high) {
-            int mid = low + (high - low) / 2; // Avoid potential integer overflow
-
-            // compareTo() returns: 0 if equal, <0 if key is smaller, >0 if key is larger
-            int comparison = key.compareTo(arr[mid]);
-
-            if (comparison == 0) {
+        for (String id : bogies) {
+            if (id.equals(searchKey)) {
                 found = true;
-                position = mid;
-                break; // Found the key!
-            } else if (comparison < 0) {
-                high = mid - 1; // Key is in the left half
-            } else {
-                low = mid + 1; // Key is in the right half
+                break;
             }
         }
 
         if (found) {
-            System.out.println("[FOUND]     : Bogie " + key + " is at sorted index " + position);
+            System.out.println(">>> SUCCESS: Bogie " + searchKey + " found in the consist.");
         } else {
-            System.out.println("[NOT FOUND] : Bogie " + key + " is not in the system.");
+            System.out.println(">>> NOT FOUND: Bogie " + searchKey + " does not exist in this train.");
         }
     }
 }
