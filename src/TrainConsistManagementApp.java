@@ -1,55 +1,68 @@
-import java.util.*;
+import java.util.Arrays;
 
 /**
- * UC18: Linear Search for Bogie ID (Array-Based Searching)
- * This class demonstrates the fundamental sequential search technique
- * to locate a specific bogie ID in an unsorted array.
+ * UC19: Binary Search for Bogie ID (Optimized Searching)
+ * This class demonstrates the divide-and-conquer strategy to find
+ * a bogie ID in O(log n) time.
  */
 public class TrainConsistManagementApp {
 
     public static void main(String[] args) {
-        System.out.println("=== Train Consist Management: Linear Search System ===\n");
+        System.out.println("=== Train Consist Management: Binary Search System ===\n");
 
-        // 1. Initialize an array of Bogie IDs (Unsorted)
-        String[] bogieIds = {"BG101", "BG205", "BG309", "BG412", "BG550"};
+        // 1. Initialize an array of Bogie IDs (Unsorted to test precondition handling)
+        String[] bogieIds = {"BG309", "BG101", "BG550", "BG205", "BG412"};
 
-        // 2. Define search targets (Test Cases)
-        String searchKey1 = "BG309"; // Existing ID
-        String searchKey2 = "BG999"; // Non-existing ID
+        // 2. Precondition: Binary Search REQUIRES sorted data
+        System.out.println("Initial IDs (Unsorted): " + Arrays.toString(bogieIds));
+        Arrays.sort(bogieIds);
+        System.out.println("Sorted IDs (Required): " + Arrays.toString(bogieIds));
 
-        System.out.println("Consist IDs: " + Arrays.toString(bogieIds));
+        // 3. Define search targets
+        String searchKey1 = "BG309"; // Mid/Random position
+        String searchKey2 = "BG101"; // First element
+        String searchKey3 = "BG999"; // Non-existent
 
-        // 3. Perform Linear Search
-        System.out.println("\nSearching for Bogie: " + searchKey1);
-        performLinearSearch(bogieIds, searchKey1);
-
-        System.out.println("\nSearching for Bogie: " + searchKey2);
-        performLinearSearch(bogieIds, searchKey2);
+        // 4. Perform Binary Search
+        System.out.println("\n--- Starting Binary Search Operations ---");
+        performBinarySearch(bogieIds, searchKey1);
+        performBinarySearch(bogieIds, searchKey2);
+        performBinarySearch(bogieIds, searchKey3);
 
         System.out.println("\n=====================================================");
     }
 
     /**
-     * Sequential Search Logic
-     * Traverses the array from index 0 to n-1.
+     * Binary Search Logic
+     * Uses low, high, and mid pointers to narrow the search range.
      */
-    public static void performLinearSearch(String[] arr, String key) {
-        boolean found = false;
+    public static void performBinarySearch(String[] arr, String key) {
+        int low = 0;
+        int high = arr.length - 1;
         int position = -1;
+        boolean found = false;
 
-        for (int i = 0; i < arr.length; i++) {
-            // String comparison using .equals() for safety
-            if (arr[i].equals(key)) {
+        while (low <= high) {
+            int mid = low + (high - low) / 2; // Avoid potential integer overflow
+
+            // compareTo() returns: 0 if equal, <0 if key is smaller, >0 if key is larger
+            int comparison = key.compareTo(arr[mid]);
+
+            if (comparison == 0) {
                 found = true;
-                position = i;
-                break; // Early Termination: stop searching once found
+                position = mid;
+                break; // Found the key!
+            } else if (comparison < 0) {
+                high = mid - 1; // Key is in the left half
+            } else {
+                low = mid + 1; // Key is in the right half
             }
         }
 
         if (found) {
-            System.out.println(">>> SUCCESS: Bogie " + key + " located at position " + (position + 1) + ".");
+            System.out.println("[FOUND]     : Bogie " + key + " is at sorted index " + position);
         } else {
-            System.out.println(">>> NOT FOUND: Bogie " + key + " is not present in the current consist.");
+            System.out.println("[NOT FOUND] : Bogie " + key + " is not in the system.");
         }
     }
 }
