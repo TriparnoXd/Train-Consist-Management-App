@@ -1,43 +1,55 @@
-import java.util.Arrays;
+import java.util.*;
 
 /**
- * UC17: Sort Bogie Names Using Arrays.sort()
- * This class demonstrates the use of Java's built-in utility methods
- * for efficient, alphabetical sorting of bogie types.
+ * UC18: Linear Search for Bogie ID (Array-Based Searching)
+ * This class demonstrates the fundamental sequential search technique
+ * to locate a specific bogie ID in an unsorted array.
  */
 public class TrainConsistManagementApp {
 
     public static void main(String[] args) {
-        System.out.println("=== Train Consist Management: Built-in Array Sorting ===\n");
+        System.out.println("=== Train Consist Management: Linear Search System ===\n");
 
-        // 1. Initialize an array of bogie type names
-        // Note: The data is unsorted and contains duplicates to test robustness.
-        String[] bogieTypes = {
-                "Sleeper",
-                "AC Chair",
-                "First Class",
-                "General",
-                "Luxury",
-                "Sleeper"
-        };
+        // 1. Initialize an array of Bogie IDs (Unsorted)
+        String[] bogieIds = {"BG101", "BG205", "BG309", "BG412", "BG550"};
 
-        System.out.println("Initial Bogie Names:  " + Arrays.toString(bogieTypes));
+        // 2. Define search targets (Test Cases)
+        String searchKey1 = "BG309"; // Existing ID
+        String searchKey2 = "BG999"; // Non-existing ID
 
-        // 2. Perform Alphabetical Sorting
-        // Arrays.sort() uses 'Natural Ordering' for Strings (A-Z)
-        Arrays.sort(bogieTypes);
+        System.out.println("Consist IDs: " + Arrays.toString(bogieIds));
 
-        // 3. Display the Sorted Results
-        System.out.println("Sorted Bogie Names:   " + Arrays.toString(bogieTypes));
+        // 3. Perform Linear Search
+        System.out.println("\nSearching for Bogie: " + searchKey1);
+        performLinearSearch(bogieIds, searchKey1);
 
-        // 4. Edge Case: Single Element Array
-        String[] singleBogie = {"Engine"};
-        Arrays.sort(singleBogie);
-        System.out.println("Single Element Sort:  " + Arrays.toString(singleBogie));
+        System.out.println("\nSearching for Bogie: " + searchKey2);
+        performLinearSearch(bogieIds, searchKey2);
 
-        // 5. Performance Context
-        System.out.println("\nLibrary Note: Arrays.sort() is O(n log n), making it ideal for large datasets.");
-        System.out.println("Standard libraries are preferred in production for speed and readability.");
-        System.out.println("========================================================");
+        System.out.println("\n=====================================================");
+    }
+
+    /**
+     * Sequential Search Logic
+     * Traverses the array from index 0 to n-1.
+     */
+    public static void performLinearSearch(String[] arr, String key) {
+        boolean found = false;
+        int position = -1;
+
+        for (int i = 0; i < arr.length; i++) {
+            // String comparison using .equals() for safety
+            if (arr[i].equals(key)) {
+                found = true;
+                position = i;
+                break; // Early Termination: stop searching once found
+            }
+        }
+
+        if (found) {
+            System.out.println(">>> SUCCESS: Bogie " + key + " located at position " + (position + 1) + ".");
+        } else {
+            System.out.println(">>> NOT FOUND: Bogie " + key + " is not present in the current consist.");
+        }
     }
 }
