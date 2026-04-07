@@ -1,70 +1,68 @@
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * Bogie Class: Represents a custom object with attributes.
- */
-class Bogie {
-    private String name;
-    private int capacity;
-
-    public Bogie(String name, int capacity) {
-        this.name = name;
-        this.capacity = capacity;
-    }
-
-    public String getName() { return name; }
-    public int getCapacity() { return capacity; }
-
-    @Override
-    public String toString() {
-        return String.format("[Type: %s, Capacity: %d]", name, capacity);
-    }
-}
-
-/**
- * UC10: Count Total Seats in Train (reduce)
- * This class demonstrates functional aggregation to calculate total
- * seating capacity across the entire train consist.
+ * UC11: Validate Train ID & Cargo Codes (Regex)
+ * This class demonstrates format enforcement using Regular Expressions
+ * to ensure data integrity before the train is processed.
  */
 public class TrainConsistManagementApp {
 
+    // Define Regex Patterns as constants for reusability
+    // TRN- followed by exactly 4 digits (\\d{4})
+    private static final String TRAIN_ID_REGEX = "TRN-\\d{4}";
+
+    // PET- followed by exactly 2 uppercase letters ([A-Z]{2})
+    private static final String CARGO_CODE_REGEX = "PET-[A-Z]{2}";
+
     public static void main(String[] args) {
-        System.out.println("=== Train Consist Management: Capacity Aggregation ===");
+        System.out.println("=== Train Consist Management: Regex Validation ===");
 
-        // 1. Initialize the list of bogies
-        List<Bogie> trainConsist = new ArrayList<>();
-        trainConsist.add(new Bogie("Sleeper", 72));
-        trainConsist.add(new Bogie("Sleeper", 72));
-        trainConsist.add(new Bogie("AC Chair", 56));
-        trainConsist.add(new Bogie("First Class", 24));
-        trainConsist.add(new Bogie("General", 90));
+        // 1. Compile the Patterns
+        Pattern trainIdPattern = Pattern.compile(TRAIN_ID_REGEX);
+        Pattern cargoCodePattern = Pattern.compile(CARGO_CODE_REGEX);
 
-        System.out.println("Current Train Consist:");
-        trainConsist.forEach(System.out::println);
+        // 2. Test Data (Valid and Invalid)
+        String[] testTrainIds = {"TRN-1234", "TRAIN12", "TRN-123", "TRN-12345", "TRN-9999"};
+        String[] testCargoCodes = {"PET-AB", "PET-bc", "PET123", "PET-XY", "AB-PET"};
 
-        // 2. Stream Pipeline: Map and Reduce
-        // Step 1: stream() - Start the pipeline
-        // Step 2: map() - Extract only the capacity (Integer) from each Bogie
-        // Step 3: reduce() - Sum all capacities starting from an identity of 0
-        int totalSeatingCapacity = trainConsist.stream()
-                .map(Bogie::getCapacity)            // Extracting numeric values
-                .reduce(0, Integer::sum);           // Aggregating into a single total
+        // 3. Validate Train IDs
+        System.out.println("\n--- Validating Train IDs ---");
+        for (String id : testTrainIds) {
+            Matcher matcher = trainIdPattern.matcher(id);
+            if (matcher.matches()) {
+                System.out.println("[VALID]   : " + id);
+            } else {
+                System.out.println("[INVALID] : " + id + " (Required format: TRN-xxxx)");
+            }
+        }
 
-        // 3. Display the Aggregated Result
-        System.out.println("\n--- Operational Analytics Report ---");
-        System.out.println("Total Number of Bogies: " + trainConsist.size());
-        System.out.println("Total Seating Capacity: " + totalSeatingCapacity + " seats");
-        System.out.println("------------------------------------");
+        // 4. Validate Cargo Codes
+        System.out.println("\n--- Validating Cargo Codes ---");
+        for (String code : testCargoCodes) {
+            Matcher matcher = cargoCodePattern.matcher(code);
+            if (matcher.matches()) {
+                System.out.println("[VALID]   : " + code);
+            } else {
+                System.out.println("[INVALID] : " + code + " (Required format: PET-XX)");
+            }
+        }
 
-        // 4. Verification with Empty List (Edge Case Handling)
-        List<Bogie> emptyConsist = new ArrayList<>();
-        int emptyTotal = emptyConsist.stream()
-                .map(Bogie::getCapacity)
-                .reduce(0, Integer::sum);
-        System.out.println("Empty Train Capacity Check: " + emptyTotal + " seats");
+        // 5. Example of Functional Usage
+        System.out.println("\n--- Final System Check ---");
+        String finalId = "TRN-2026";
+        if (validate(finalId, TRAIN_ID_REGEX)) {
+            System.out.println("System initialized successfully for Train: " + finalId);
+        }
 
-        // 5. Verification of Original Collection Integrity
-        System.out.println("\nVerification: Original list remains unchanged with "
-                + trainConsist.size() + " bogies.");
-        System.out.println("
+        System.out.println("===================================================");
+    }
+
+    /**
+     * Helper method to demonstrate clean validation logic
+     */
+    public static boolean validate(String input, String regex) {
+        return Pattern.compile(regex).matcher(input).matches();
+    }
+}
