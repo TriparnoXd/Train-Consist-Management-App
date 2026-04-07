@@ -1,90 +1,59 @@
-import java.util.*;
+import java.util.Arrays;
 
 /**
- * Custom Runtime Exception: CargoSafetyException
- * This represents a safety violation discovered during train operations.
- */
-class CargoSafetyException extends RuntimeException {
-    public CargoSafetyException(String message) {
-        super(message);
-    }
-}
-
-/**
- * GoodsBogie Class: Represents a freight car with dynamic cargo assignment.
- */
-class GoodsBogie {
-    private String shape;
-    private String currentCargo;
-
-    public GoodsBogie(String shape) {
-        this.shape = shape;
-        this.currentCargo = "Empty";
-    }
-
-    /**
-     * Business Logic: Assigns cargo with strict safety checks.
-     * Rule: Petroleum can ONLY be assigned to Cylindrical bogies.
-     */
-    public void assignCargo(String cargo) {
-        System.out.println("Operation: Attempting to load " + cargo + " into " + shape + " bogie.");
-
-        try {
-            if (cargo.equalsIgnoreCase("Petroleum") && !shape.equalsIgnoreCase("Cylindrical")) {
-                throw new CargoSafetyException("SAFETY ALERT: Cannot load Petroleum into a " + shape + " bogie!");
-            }
-            this.currentCargo = cargo;
-            System.out.println("Success: Cargo '" + cargo + "' assigned successfully.");
-        }
-        catch (CargoSafetyException e) {
-            // Handle the specific safety violation
-            System.err.println("TERMINATED: " + e.getMessage());
-        }
-        finally {
-            // This block runs REGARDLESS of success or failure
-            System.out.println("Log: Safety validation check completed for this unit.");
-            System.out.println("--------------------------------------------------");
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "Bogie Shape: " + shape + " | Current Cargo: " + currentCargo;
-    }
-}
-
-/**
- * UC15: Safe Cargo Assignment Using try-catch-finally
- * This class demonstrates structured exception handling for runtime operations.
+ * UC16: Sort Passenger Bogies by Capacity (Bubble Sort – Algorithm Intro)
+ * This class demonstrates manual sorting logic using nested loops and
+ * adjacent comparisons to build algorithmic thinking.
  */
 public class TrainConsistManagementApp {
 
     public static void main(String[] args) {
-        System.out.println("=== Train Consist Management: Structured Error Handling ===\n");
+        System.out.println("=== Train Consist Management: Manual Bubble Sort ===\n");
 
-        // 1. Initialize different bogie shapes
-        GoodsBogie tanker = new GoodsBogie("Cylindrical");
-        GoodsBogie freightCar = new GoodsBogie("Rectangular");
+        // 1. Initialize an array of passenger bogie capacities
+        // Scenarios include: Unsorted, Duplicates, and Single elements
+        int[] bogieCapacities = {72, 56, 24, 70, 56, 60};
 
-        // 2. Scenario A: Safe Assignment
-        // Loading petroleum into a cylindrical bogie is safe.
-        tanker.assignCargo("Petroleum");
+        System.out.println("Initial Capacities: " + Arrays.toString(bogieCapacities));
 
-        // 3. Scenario B: Unsafe Assignment (Handled)
-        // Loading petroleum into a rectangular bogie is a fire hazard.
-        // The system will catch the exception and keep running.
-        freightCar.assignCargo("Petroleum");
+        // 2. Perform Bubble Sort Algorithm
+        bubbleSort(bogieCapacities);
 
-        // 4. Scenario C: Another Safe Assignment
-        // Loading Coal into a rectangular bogie is safe.
-        freightCar.assignCargo("Coal");
+        // 3. Display the Sorted Results
+        System.out.println("Sorted Capacities:  " + Arrays.toString(bogieCapacities));
 
-        // 5. Final System Status
-        System.out.println("\n--- Final Yard Status ---");
-        System.out.println(tanker);
-        System.out.println(freightCar);
+        // 4. Edge Case: Single Element Array
+        int[] singleBogie = {50};
+        bubbleSort(singleBogie);
+        System.out.println("Single Bogie Sort:  " + Arrays.toString(singleBogie));
 
-        System.out.println("\nSystem Check: Application remains stable after handling safety alerts.");
-        System.out.println("==========================================================");
+        System.out.println("\nAlgorithm Note: Bubble Sort uses O(n²) time complexity.");
+        System.out.println("=====================================================");
     }
+
+    /**
+     * Manual implementation of the Bubble Sort algorithm.
+     * Iterates through the array and swaps adjacent elements if they are out of order.
+     */
+    public static void bubbleSort(int[] arr) {
+        int n = arr.length;
+
+        // Outer loop: Controls the number of passes
+        for (int i = 0; i < n - 1; i++) {
+
+            // Inner loop: Compares adjacent elements
+            // After each pass, the largest element is 'bubbled' to the end (n-i-1)
+            for (int j = 0; j < n - i - 1; j++) {
+
+                // If the left element is greater than the right, swap them
+                if (arr[j] > arr[j + 1]) {
+                    // Swapping Logic using a temporary variable
+                    int temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
+                }
+            }
+        }
+    }
+}
 }
