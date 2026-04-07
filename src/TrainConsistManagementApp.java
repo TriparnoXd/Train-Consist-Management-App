@@ -1,8 +1,8 @@
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Bogie Class: Represents a custom object with attributes.
- * This allows us to move beyond simple key-value pairs to structured data.
  */
 class Bogie {
     private String name;
@@ -23,42 +23,51 @@ class Bogie {
 }
 
 /**
- * UC7: Sort Bogies by Capacity (Comparator)
- * This class demonstrates custom object sorting using the Comparator interface.
+ * UC8: Filter Passenger Bogies Using Streams
+ * This class demonstrates functional-style collection processing to
+ * select bogies based on business rules (Capacity > 60).
  */
 public class TrainConsistManagementApp {
 
     public static void main(String[] args) {
-        System.out.println("=== Train Consist Management: Capacity Sorting ===");
+        System.out.println("=== Train Consist Management: Stream Filtering ===");
 
-        // 1. Initialize a List to store Bogie objects
-        List<Bogie> passengerBogies = new ArrayList<>();
+        // 1. Initialize the list of bogies (as in UC7)
+        List<Bogie> allBogies = new ArrayList<>();
+        allBogies.add(new Bogie("Sleeper", 72));
+        allBogies.add(new Bogie("AC Chair", 56));
+        allBogies.add(new Bogie("First Class", 24));
+        allBogies.add(new Bogie("General", 90));
+        allBogies.add(new Bogie("Executive", 40));
 
-        // 2. Add custom Bogie objects to the list
-        passengerBogies.add(new Bogie("Sleeper", 72));
-        passengerBogies.add(new Bogie("AC Chair", 56));
-        passengerBogies.add(new Bogie("First Class", 24));
-        passengerBogies.add(new Bogie("General", 90));
+        System.out.println("Total bogies in system: " + allBogies.size());
 
-        System.out.println("Initial list of bogies added.");
+        // 2. Stream Pipeline: Filter and Collect
+        // We want to find "High-Capacity" bogies (Capacity > 60)
+        int threshold = 60;
+        System.out.println("\nFiltering bogies with capacity greater than " + threshold + "...");
 
-        // 3. Sorting using Comparator
-        // We use Comparator.comparingInt to define the sorting criteria (Capacity)
-        // This sorts in Natural Order (Ascending: Smallest to Largest)
-        passengerBogies.sort(Comparator.comparingInt(Bogie::getCapacity));
+        List<Bogie> highCapacityBogies = allBogies.stream()
+                .filter(b -> b.getCapacity() > threshold) // Lambda expression for the condition
+                .collect(Collectors.toList());            // Gather results into a new list
 
-        // 4. Display the Sorted Results
-        System.out.println("\n--- Bogies Sorted by Capacity (Ascending) ---");
-        for (Bogie b : passengerBogies) {
-            System.out.println(b);
+        // 3. Display Filtered Results
+        System.out.println("--- High-Capacity Bogie Report ---");
+        if (highCapacityBogies.isEmpty()) {
+            System.out.println("No bogies match the criteria.");
+        } else {
+            highCapacityBogies.forEach(System.out::println);
         }
 
-        // 5. Bonus: Sorting in Descending Order (Highest Capacity First)
-        System.out.println("\n--- Bogies Sorted by Capacity (Descending) ---");
-        passengerBogies.sort(Comparator.comparingInt(Bogie::getCapacity).reversed());
-        for (Bogie b : passengerBogies) {
-            System.out.println(b);
-        }
+        // 4. Verification of Original Collection Integrity
+        // The Stream API does not modify 'allBogies'
+        System.out.println("\nVerification: Original list still contains " + allBogies.size() + " bogies.");
+
+        // 5. Another Example: Finding small bogies (Capacity <= 40)
+        System.out.println("\n--- Special-Purpose Bogie Report (Capacity <= 40) ---");
+        allBogies.stream()
+                .filter(b -> b.getCapacity() <= 40)
+                .forEach(System.out::println);
 
         System.out.println("=================================================");
     }
