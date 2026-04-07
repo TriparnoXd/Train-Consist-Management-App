@@ -1,87 +1,90 @@
 import java.util.*;
 
 /**
- * Custom Exception: InvalidCapacityException
- * A domain-specific checked exception to handle railway business rule violations.
+ * Custom Runtime Exception: CargoSafetyException
+ * This represents a safety violation discovered during train operations.
  */
-class InvalidCapacityException extends Exception {
-    public InvalidCapacityException(String message) {
+class CargoSafetyException extends RuntimeException {
+    public CargoSafetyException(String message) {
         super(message);
     }
 }
 
 /**
- * Bogie Class: Represents a custom object with built-in validation.
+ * GoodsBogie Class: Represents a freight car with dynamic cargo assignment.
  */
-class Bogie {
-    private String name;
-    private int capacity;
+class GoodsBogie {
+    private String shape;
+    private String currentCargo;
+
+    public GoodsBogie(String shape) {
+        this.shape = shape;
+        this.currentCargo = "Empty";
+    }
 
     /**
-     * Constructor with Fail-Fast Validation.
-     * @throws InvalidCapacityException if capacity is less than or equal to zero.
+     * Business Logic: Assigns cargo with strict safety checks.
+     * Rule: Petroleum can ONLY be assigned to Cylindrical bogies.
      */
-    public Bogie(String name, int capacity) throws InvalidCapacityException {
-        if (capacity <= 0) {
-            throw new InvalidCapacityException("Invalid Capacity: [" + capacity +
-                    "]. Capacity must be greater than zero for " + name + ".");
+    public void assignCargo(String cargo) {
+        System.out.println("Operation: Attempting to load " + cargo + " into " + shape + " bogie.");
+
+        try {
+            if (cargo.equalsIgnoreCase("Petroleum") && !shape.equalsIgnoreCase("Cylindrical")) {
+                throw new CargoSafetyException("SAFETY ALERT: Cannot load Petroleum into a " + shape + " bogie!");
+            }
+            this.currentCargo = cargo;
+            System.out.println("Success: Cargo '" + cargo + "' assigned successfully.");
         }
-        this.name = name;
-        this.capacity = capacity;
+        catch (CargoSafetyException e) {
+            // Handle the specific safety violation
+            System.err.println("TERMINATED: " + e.getMessage());
+        }
+        finally {
+            // This block runs REGARDLESS of success or failure
+            System.out.println("Log: Safety validation check completed for this unit.");
+            System.out.println("--------------------------------------------------");
+        }
     }
 
     @Override
     public String toString() {
-        return String.format("Bogie: %-12s | Capacity: %d seats", name, capacity);
+        return "Bogie Shape: " + shape + " | Current Cargo: " + currentCargo;
     }
 }
 
 /**
- * UC14: Handle Invalid Bogie Capacity (Custom Exception)
- * This class demonstrates enforcing business constraints during object creation.
+ * UC15: Safe Cargo Assignment Using try-catch-finally
+ * This class demonstrates structured exception handling for runtime operations.
  */
 public class TrainConsistManagementApp {
 
     public static void main(String[] args) {
-        System.out.println("=== Train Consist Management: Custom Exception Handling ===\n");
+        System.out.println("=== Train Consist Management: Structured Error Handling ===\n");
 
-        List<Bogie> trainConsist = new ArrayList<>();
+        // 1. Initialize different bogie shapes
+        GoodsBogie tanker = new GoodsBogie("Cylindrical");
+        GoodsBogie freightCar = new GoodsBogie("Rectangular");
 
-        // Test Case 1: Valid Capacity Creation
-        try {
-            System.out.println("Attempting to add valid bogies...");
-            trainConsist.add(new Bogie("Sleeper", 72));
-            trainConsist.add(new Bogie("AC Chair", 56));
-            System.out.println("Successfully added valid bogies.");
-        } catch (InvalidCapacityException e) {
-            System.err.println("Unexpected Error: " + e.getMessage());
-        }
+        // 2. Scenario A: Safe Assignment
+        // Loading petroleum into a cylindrical bogie is safe.
+        tanker.assignCargo("Petroleum");
 
-        // Test Case 2: Zero Capacity Detection
-        try {
-            System.out.println("\nAttempting to add a bogie with ZERO capacity...");
-            trainConsist.add(new Bogie("Pantry Car", 0));
-        } catch (InvalidCapacityException e) {
-            System.err.println("CATCHED ERROR: " + e.getMessage());
-        }
+        // 3. Scenario B: Unsafe Assignment (Handled)
+        // Loading petroleum into a rectangular bogie is a fire hazard.
+        // The system will catch the exception and keep running.
+        freightCar.assignCargo("Petroleum");
 
-        // Test Case 3: Negative Capacity Detection
-        try {
-            System.out.println("\nAttempting to add a bogie with NEGATIVE capacity...");
-            trainConsist.add(new Bogie("First Class", -10));
-        } catch (InvalidCapacityException e) {
-            System.err.println("CATCHED ERROR: " + e.getMessage());
-        }
+        // 4. Scenario C: Another Safe Assignment
+        // Loading Coal into a rectangular bogie is safe.
+        freightCar.assignCargo("Coal");
 
-        // Final Result Display
-        System.out.println("\n--- Final Valid Train Consist ---");
-        if (trainConsist.isEmpty()) {
-            System.out.println("No bogies were successfully added.");
-        } else {
-            trainConsist.forEach(System.out::println);
-        }
+        // 5. Final System Status
+        System.out.println("\n--- Final Yard Status ---");
+        System.out.println(tanker);
+        System.out.println(freightCar);
 
-        System.out.println("\nTotal Valid Bogies: " + trainConsist.size());
+        System.out.println("\nSystem Check: Application remains stable after handling safety alerts.");
         System.out.println("==========================================================");
     }
 }
